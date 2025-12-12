@@ -18,7 +18,7 @@ let enemigoVelocidad = 2;
 let puntuacion = 0;
 let anchoLienzo = 600;
 let altoLienzo = 400;
-let juegoActivo = true; // NUEVA: Controla si el juego está corriendo
+let juegoActivo = true; // Controla si el juego está corriendo
 
 function setup() {
   // Inicializa el lienzo
@@ -36,7 +36,7 @@ function colocarNuevoObjetivo() {
   objetivoY = random(objetivoTamaño / 2, height - objetivoTamaño / 2);
 }
 
-// NUEVA: Función de Reinicio
+// Función de Reinicio
 function reiniciarJuego() {
   // 1. Restablece las variables del juego
   puntuacion = 0;
@@ -140,11 +140,10 @@ function draw() {
   }
 }
 
-// NUEVA FUNCIÓN: Detecta la pulsación de la Barra Espaciadora
+// CORRECCIÓN FINAL: Usa el código numérico (keyCode) para detectar la Barra Espaciadora.
 function keyReleased() {
-  // Si la tecla es la barra espaciadora (key === ' ')
-  // Y el juego NO está activo (perdiste)
-  if (key === ' ' && juegoActivo === false) {
+  // El keyCode para la Barra Espaciadora es 32
+  if (keyCode === 32 && juegoActivo === false) {
     reiniciarJuego(); // Llama a la función de reinicio
   }
 }
