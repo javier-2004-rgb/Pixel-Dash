@@ -1,22 +1,38 @@
-// Variables para la posición y velocidad del personaje
+// Variables para el personaje (círculo rosa)
 let personajeX;
 let personajeY;
 let velocidad = 5; 
 
+// Variables para el objetivo (cuadrado amarillo)
+let objetivoX;
+let objetivoY;
+let objetivoTamaño = 30;
+
+// Variables de juego
+let puntuacion = 0;
+let anchoLienzo = 600;
+let altoLienzo = 400;
+
 function setup() {
-  // 1. Inicializa el lienzo (Canvas) donde se dibuja el juego
-  createCanvas(600, 400); 
-  
-  // 2. Establece la posición inicial del personaje en el centro
+  // Inicializa el lienzo
+  createCanvas(anchoLienzo, altoLienzo); 
   personajeX = width / 2;
   personajeY = height / 2;
+  
+  // Llama a la función para colocar el primer objetivo
+  colocarNuevoObjetivo(); 
+}
+
+function colocarNuevoObjetivo() {
+  // Coloca el objetivo en una posición aleatoria dentro del lienzo
+  objetivoX = random(objetivoTamaño / 2, width - objetivoTamaño / 2);
+  objetivoY = random(objetivoTamaño / 2, height - objetivoTamaño / 2);
 }
 
 function draw() {
-  // 1. Limpia el fondo en cada frame (para evitar el rastro)
-  background(50); 
+  background(50); // Limpia el fondo 
   
-  // 2. Lógica de movimiento (se ejecuta 60 veces por segundo)
+  // --- 1. Lógica de Movimiento ---
   if (keyIsDown(LEFT_ARROW)) {
     personajeX -= velocidad;
   }
@@ -30,11 +46,36 @@ function draw() {
     personajeY += velocidad;
   }
   
-  // 3. Restricción de bordes (que el personaje no se salga)
-  personajeX = constrain(personajeX, 20, width - 20);
-  personajeY = constrain(personajeY, 20, height - 20);
+  // Restricción de bordes 
+  let radioPersonaje = 20; // Mitad del diámetro de 40px
+  personajeX = constrain(personajeX, radioPersonaje, width - radioPersonaje);
+  personajeY = constrain(personajeY, radioPersonaje, height - radioPersonaje);
 
-  // 4. Dibuja el personaje (un círculo rosa)
+  // --- 2. Detección de Colisión ---
+  
+  // Calcula la distancia entre el centro del personaje y el centro del objetivo
+  let distancia = dist(personajeX, personajeY, objetivoX, objetivoY);
+  
+  // Si la distancia es menor a la suma de sus radios/tamaños, hubo colisión
+  if (distancia < radioPersonaje + (objetivoTamaño / 2)) {
+    puntuacion += 10; // Aumenta la puntuación
+    colocarNuevoObjetivo(); // Mueve el objetivo a una nueva posición
+  }
+
+  // --- 3. Dibujar Elementos ---
+  
+  // Dibujar el objetivo (cuadrado amarillo)
+  fill(255, 255, 0); // Amarillo
+  rectMode(CENTER); // Dibuja el cuadrado desde su centro
+  square(objetivoX, objetivoY, objetivoTamaño); 
+
+  // Dibujar el personaje (círculo rosa)
   fill(255, 0, 100); 
-  circle(personajeX, personajeY, 40); 
+  circle(personajeX, personajeY, radioPersonaje * 2); 
+  
+  // Dibujar la puntuación en la esquina
+  fill(255); // Color blanco para el texto
+  textSize(24);
+  textAlign(LEFT, TOP); // Alineación a la esquina superior izquierda
+  text(`Puntuación: ${puntuacion}`, 10, 10);
 }
