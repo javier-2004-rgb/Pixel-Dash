@@ -83,6 +83,14 @@ function draw() {
 
   // Detección de Derrota
   let distanciaEnemigo = dist(personajeX, personajeY, enemigoX, enemigoY);
+  let umbralColision = radioPersonaje + (enemigoTamaño / 2);
+  if (distanciaEnemigo < umbralColision) {
+    noLoop();
+    fill(255, 0, 0); // Color rojo
+    textSize(50);
+    textAlign(CENTER, CENTER);
+    text('¡DERROTA!', width / 2, height / 2);
+  }
   
   if (distanciaEnemigo < radioPersonaje + (enemigoTamaño / 2)) {
     // Código de derrota: detiene el loop draw()
