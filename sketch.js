@@ -22,12 +22,12 @@ let juegoActivo = true; // Controla si el juego está corriendo
 let nivelDificultad = 0; 
 
 // Variables de MEJORAS
-let puntuacionMaxima = 0; // NUEVO: Para guardar la mejor puntuación
+let puntuacionMaxima = 0; // NUEVO: Para guardar la mejor puntuación (High Score)
 let vida = 3; // NUEVO: Vida inicial
-let invulnerable = false; // NUEVO: Para evitar perder 3 vidas en 1 frame
-let tiempoInvulnerable = 0; // NUEVO: Temporizador de invulnerabilidad
+let invulnerable = false; // NUEVO: Para evitar perder vida constantemente
+let tiempoInvulnerable = 0; // NUEVO: Temporizador para la invulnerabilidad
 let mostrarNivelUp = false; // NUEVO: Controla el mensaje de nivel
-let nivelUpTiempo = 0; // NUEVO: Temporizador para el mensaje
+let nivelUpTiempo = 0; // NUEVO: Temporizador para el mensaje Nivel Up
 
 function setup() {
   // Inicializa el lienzo
@@ -37,10 +37,10 @@ function setup() {
   enemigoX = 50; 
   enemigoY = 50;
   
-  // NUEVO: Cargar la puntuación máxima guardada
+  // NUEVO: Cargar la puntuación máxima guardada (si existe)
   let recordGuardado = localStorage.getItem('pixelDashRecord');
   if (recordGuardado !== null) {
-    puntuacionMaxima = int(recordGuardado); // Convierte a número entero
+    puntuacionMaxima = int(recordGuardado); 
   }
 
   colocarNuevoObjetivo(); 
@@ -56,11 +56,11 @@ function reiniciarJuego() {
   // 1. Restablece las variables del juego
   puntuacion = 0;
   juegoActivo = true;
-  enemigoVelocidad = 2; // Resetea la velocidad del enemigo
-  velocidad = 5; // Resetea la velocidad del personaje
+  enemigoVelocidad = 2; 
+  velocidad = 5; 
   nivelDificultad = 0; 
   
-  // NUEVO: Restablece las variables de vida y temporizadores
+  // Restablece las variables de vida y temporizadores
   vida = 3; 
   invulnerable = false;
   tiempoInvulnerable = 0;
@@ -117,7 +117,7 @@ function draw() {
       enemigoVelocidad += 0.5; 
       velocidad += 0.5; 
       
-      // NUEVO: Activa el mensaje de Nivel Up
+      // Activa el mensaje de Nivel Up
       mostrarNivelUp = true;
       nivelUpTiempo = millis(); // Guarda el tiempo actual
     }
@@ -150,7 +150,7 @@ function draw() {
     
     // Si la vida llega a cero, ¡DERROTA!
     if (vida <= 0) {
-      // NUEVO: Guardar la puntuación máxima si se supera
+      // Guardar la puntuación máxima si se supera
       if (puntuacion > puntuacionMaxima) {
         puntuacionMaxima = puntuacion;
         localStorage.setItem('pixelDashRecord', puntuacionMaxima);
@@ -173,7 +173,7 @@ function draw() {
   rectMode(CENTER); 
   square(objetivoX, objetivoY, objetivoTamaño); 
 
-  // NUEVO: Dibuja el personaje con parpadeo si es invulnerable
+  // Dibuja el personaje con parpadeo si es invulnerable
   if (!(invulnerable && (floor(millis() / 100) % 2 === 0))) {
      // Dibuja el círculo solo si NO es invulnerable O si está en el momento "encendido" del parpadeo
     fill(255, 0, 100); 
@@ -188,18 +188,18 @@ function draw() {
   textAlign(LEFT, TOP); 
   text(`Puntuación: ${puntuacion}`, 10, 10);
 
-  // NUEVO: Puntuación Máxima
+  // Puntuación Máxima
   textSize(18); 
   textAlign(RIGHT, TOP); 
   text(`Máximo: ${puntuacionMaxima}`, width - 10, 10);
   
-  // NUEVO: Vida
+  // Vida
   textAlign(LEFT, TOP);
   textSize(20);
   fill(255, 0, 0); // Rojo para la vida
   text(`❤️ Vida: ${vida}`, 10, 40); 
   
-  // NUEVO: Manejar y Dibujar el Mensaje de Nivel Up
+  // Manejar y Dibujar el Mensaje de Nivel Up
   if (mostrarNivelUp) {
     if (millis() < nivelUpTiempo + 1500) { // Muestra por 1.5 segundos
       fill(0, 255, 0); // Verde brillante
