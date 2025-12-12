@@ -19,6 +19,7 @@ let puntuacion = 0;
 let anchoLienzo = 600;
 let altoLienzo = 400;
 let juegoActivo = true; // Controla si el juego está corriendo
+let nivelDificultad = 0; // NUEVO: Controla la dificultad actual (0, 1, 2, 3...)
 
 function setup() {
   // Inicializa el lienzo
@@ -41,8 +42,9 @@ function reiniciarJuego() {
   // 1. Restablece las variables del juego
   puntuacion = 0;
   juegoActivo = true;
-  enemigoVelocidad = 2; // Resetea la velocidad del enemigo a su valor inicial
-  velocidad = 5; // Resetea la velocidad del personaje a su valor inicial
+  enemigoVelocidad = 2; // Resetea la velocidad del enemigo
+  velocidad = 5; // Resetea la velocidad del personaje
+  nivelDificultad = 0; // CORRECCIÓN: Resetea el nivel de dificultad
   
   // 2. Coloca al personaje y al enemigo en sus posiciones iniciales
   personajeX = width / 2;
@@ -86,11 +88,14 @@ function draw() {
     puntuacion += 10;
     colocarNuevoObjetivo();
 
-    // Lógica de Dificultad Progresiva
-    // Si la puntuación es un múltiplo de 50 (50, 100, 150, etc.)
-    if (puntuacion > 0 && puntuacion % 50 === 0) {
+    // CORRECCIÓN: Lógica de Dificultad Progresiva basada en Nivel
+    let nuevoNivel = floor(puntuacion / 50); // Calcula el nivel (1 para 50, 2 para 100...)
+
+    if (nuevoNivel > nivelDificultad) {
+      nivelDificultad = nuevoNivel; // Actualiza el nivel actual
+      
       enemigoVelocidad += 0.5; // El enemigo se vuelve más rápido
-      velocidad += 0.5; // El personaje también se vuelve más rápido (para que sea desafiante pero jugable)
+      velocidad += 0.5; // El personaje también se vuelve más rápido
     }
   }
 
@@ -149,7 +154,7 @@ function draw() {
   }
 }
 
-// CORRECCIÓN FINAL: Usa el código numérico (keyCode) para detectar la Barra Espaciadora.
+// FUNCIÓN DE REINICIO CON CORRECCIÓN DE TECLA (keyCode 32)
 function keyReleased() {
   // El keyCode para la Barra Espaciadora es 32
   if (keyCode === 32 && juegoActivo === false) {
