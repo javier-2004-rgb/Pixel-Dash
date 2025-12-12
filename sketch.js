@@ -1,7 +1,7 @@
 // Variables para el personaje (círculo rosa)
 let personajeX;
 let personajeY;
-let velocidad = 5; 
+let velocidad = 5; // Velocidad base del personaje
 
 // Variables para el objetivo (cuadrado amarillo)
 let objetivoX;
@@ -12,7 +12,7 @@ let objetivoTamaño = 30;
 let enemigoX;
 let enemigoY;
 let enemigoTamaño = 40;
-let enemigoVelocidad = 2;
+let enemigoVelocidad = 2; // Velocidad base del enemigo
 
 // Variables de juego
 let puntuacion = 0;
@@ -41,6 +41,8 @@ function reiniciarJuego() {
   // 1. Restablece las variables del juego
   puntuacion = 0;
   juegoActivo = true;
+  enemigoVelocidad = 2; // Resetea la velocidad del enemigo a su valor inicial
+  velocidad = 5; // Resetea la velocidad del personaje a su valor inicial
   
   // 2. Coloca al personaje y al enemigo en sus posiciones iniciales
   personajeX = width / 2;
@@ -77,12 +79,19 @@ function draw() {
   personajeX = constrain(personajeX, radioPersonaje, width - radioPersonaje);
   personajeY = constrain(personajeY, radioPersonaje, height - radioPersonaje);
 
-  // --- 2. Detección de Colisión (Objetivo) ---
+  // --- 2. Detección de Colisión (Objetivo) con Dificultad Progresiva ---
   let distanciaObjetivo = dist(personajeX, personajeY, objetivoX, objetivoY);
   
   if (distanciaObjetivo < radioPersonaje + (objetivoTamaño / 2)) {
     puntuacion += 10;
     colocarNuevoObjetivo();
+
+    // Lógica de Dificultad Progresiva
+    // Si la puntuación es un múltiplo de 50 (50, 100, 150, etc.)
+    if (puntuacion > 0 && puntuacion % 50 === 0) {
+      enemigoVelocidad += 0.5; // El enemigo se vuelve más rápido
+      velocidad += 0.5; // El personaje también se vuelve más rápido (para que sea desafiante pero jugable)
+    }
   }
 
   // --- 3. Lógica de Movimiento y Derrota del Enemigo ---
