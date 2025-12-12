@@ -12,31 +12,47 @@ let objetivoTamaño = 30;
 let enemigoX;
 let enemigoY;
 let enemigoTamaño = 40;
-let enemigoVelocidad = 2; // Más lento que el personaje (5)
+let enemigoVelocidad = 2;
 
 // Variables de juego
 let puntuacion = 0;
 let anchoLienzo = 600;
 let altoLienzo = 400;
+let juegoActivo = true; // NUEVA: Controla si el juego está corriendo
 
 function setup() {
   // Inicializa el lienzo
   createCanvas(anchoLienzo, altoLienzo); 
   personajeX = width / 2;
   personajeY = height / 2;
-  
-  // Posición inicial del enemigo (en la esquina superior izquierda)
   enemigoX = 50; 
   enemigoY = 50;
   
-  // Llama a la función para colocar el primer objetivo
   colocarNuevoObjetivo(); 
 }
 
 function colocarNuevoObjetivo() {
-  // Coloca el objetivo en una posición aleatoria dentro del lienzo
   objetivoX = random(objetivoTamaño / 2, width - objetivoTamaño / 2);
   objetivoY = random(objetivoTamaño / 2, height - objetivoTamaño / 2);
+}
+
+// NUEVA: Función de Reinicio
+function reiniciarJuego() {
+  // 1. Restablece las variables del juego
+  puntuacion = 0;
+  juegoActivo = true;
+  
+  // 2. Coloca al personaje y al enemigo en sus posiciones iniciales
+  personajeX = width / 2;
+  personajeY = height / 2;
+  enemigoX = 50; 
+  enemigoY = 50;
+  
+  // 3. Coloca el primer objetivo
+  colocarNuevoObjetivo();
+  
+  // 4. Inicia el bucle 'draw()' de nuevo
+  loop(); 
 }
 
 function draw() {
@@ -57,59 +73,47 @@ function draw() {
   }
   
   // Restricción de bordes 
-  let radioPersonaje = 20; // Mitad del diámetro de 40px
+  let radioPersonaje = 20;
   personajeX = constrain(personajeX, radioPersonaje, width - radioPersonaje);
   personajeY = constrain(personajeY, radioPersonaje, height - radioPersonaje);
 
   // --- 2. Detección de Colisión (Objetivo) ---
-  
   let distanciaObjetivo = dist(personajeX, personajeY, objetivoX, objetivoY);
   
   if (distanciaObjetivo < radioPersonaje + (objetivoTamaño / 2)) {
-    puntuacion += 10; // Aumenta la puntuación
-    colocarNuevoObjetivo(); // Mueve el objetivo a una nueva posición
+    puntuacion += 10;
+    colocarNuevoObjetivo();
   }
 
-  // --- 3. Lógica de Movimiento y Derrota del Enemigo (NUEVO) ---
+  // --- 3. Lógica de Movimiento y Derrota del Enemigo ---
   
   // Mover el enemigo lentamente hacia abajo
   enemigoY += enemigoVelocidad;
   
   // Si el enemigo se sale por abajo, hacerlo reaparecer arriba
   if (enemigoY > height + enemigoTamaño / 2) {
-    enemigoY = -enemigoTamaño / 2; // Reaparece arriba
-    enemigoX = random(50, width - 50); // En posición X aleatoria
+    enemigoY = -enemigoTamaño / 2;
+    enemigoX = random(50, width - 50);
   }
 
   // Detección de Derrota
   let distanciaEnemigo = dist(personajeX, personajeY, enemigoX, enemigoY);
-  let umbralColision = radioPersonaje + (enemigoTamaño / 2);
-  if (distanciaEnemigo < umbralColision) {
-    noLoop();
-    fill(255, 0, 0); // Color rojo
-    textSize(50);
-    textAlign(CENTER, CENTER);
-    text('¡DERROTA!', width / 2, height / 2);
-  }
+  let umbralColision = radioPersonaje + (enemigoTamaño / 2); 
   
-  if (distanciaEnemigo < radioPersonaje + (enemigoTamaño / 2)) {
-    // Código de derrota: detiene el loop draw()
-    noLoop(); 
-    fill(255, 0, 0); // Color rojo
-    textSize(50);
-    textAlign(CENTER, CENTER);
-    text('¡DERROTA!', width / 2, height / 2);
+  if (distanciaEnemigo < umbralColision) {
+    juegoActivo = false; // El juego ya no está activo
+    noLoop(); // Detiene el bucle draw()
   }
 
   // --- 4. Dibujar Elementos ---
   
   // Dibujar el enemigo (cuadrado azul)
-  fill(0, 0, 255); // Azul
-  rectMode(CENTER); // Dibuja el cuadrado desde su centro
+  fill(0, 0, 255);
+  rectMode(CENTER);
   square(enemigoX, enemigoY, enemigoTamaño); 
 
   // Dibujar el objetivo (cuadrado amarillo)
-  fill(255, 255, 0); // Amarillo
+  fill(255, 255, 0);
   rectMode(CENTER); 
   square(objetivoX, objetivoY, objetivoTamaño); 
 
@@ -118,8 +122,29 @@ function draw() {
   circle(personajeX, personajeY, radioPersonaje * 2); 
   
   // Dibujar la puntuación en la esquina
-  fill(255); // Color blanco para el texto
+  fill(255);
   textSize(24);
   textAlign(LEFT, TOP); 
   text(`Puntuación: ${puntuacion}`, 10, 10);
+  
+  // Mensaje de Derrota y Reinicio
+  if (juegoActivo === false) {
+    fill(255, 0, 0); 
+    textSize(50);
+    textAlign(CENTER, CENTER);
+    text('¡DERROTA!', width / 2, height / 2);
+    
+    fill(255); // Texto blanco
+    textSize(20);
+    text('Presiona ESPACIO para reiniciar', width / 2, height / 2 + 50);
+  }
+}
+
+// NUEVA FUNCIÓN: Detecta la pulsación de la Barra Espaciadora
+function keyReleased() {
+  // Si la tecla es la barra espaciadora (key === ' ')
+  // Y el juego NO está activo (perdiste)
+  if (key === ' ' && juegoActivo === false) {
+    reiniciarJuego(); // Llama a la función de reinicio
+  }
 }
