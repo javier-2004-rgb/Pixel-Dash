@@ -19,7 +19,15 @@ let puntuacion = 0;
 let anchoLienzo = 600;
 let altoLienzo = 400;
 let juegoActivo = true; // Controla si el juego está corriendo
-let nivelDificultad = 0; // NUEVO: Controla la dificultad actual (0, 1, 2, 3...)
+let nivelDificultad = 0; 
+
+// Variables de MEJORAS
+let puntuacionMaxima = 0; // NUEVO: Para guardar la mejor puntuación
+let vida = 3; // NUEVO: Vida inicial
+let invulnerable = false; // NUEVO: Para evitar perder 3 vidas en 1 frame
+let tiempoInvulnerable = 0; // NUEVO: Temporizador de invulnerabilidad
+let mostrarNivelUp = false; // NUEVO: Controla el mensaje de nivel
+let nivelUpTiempo = 0; // NUEVO: Temporizador para el mensaje
 
 function setup() {
   // Inicializa el lienzo
@@ -29,6 +37,12 @@ function setup() {
   enemigoX = 50; 
   enemigoY = 50;
   
+  // NUEVO: Cargar la puntuación máxima guardada
+  let recordGuardado = localStorage.getItem('pixelDashRecord');
+  if (recordGuardado !== null) {
+    puntuacionMaxima = int(recordGuardado); // Convierte a número entero
+  }
+
   colocarNuevoObjetivo(); 
 }
 
@@ -44,7 +58,13 @@ function reiniciarJuego() {
   juegoActivo = true;
   enemigoVelocidad = 2; // Resetea la velocidad del enemigo
   velocidad = 5; // Resetea la velocidad del personaje
-  nivelDificultad = 0; // CORRECCIÓN: Resetea el nivel de dificultad
+  nivelDificultad = 0; 
+  
+  // NUEVO: Restablece las variables de vida y temporizadores
+  vida = 3; 
+  invulnerable = false;
+  tiempoInvulnerable = 0;
+  mostrarNivelUp = false;
   
   // 2. Coloca al personaje y al enemigo en sus posiciones iniciales
   personajeX = width / 2;
@@ -88,18 +108,22 @@ function draw() {
     puntuacion += 10;
     colocarNuevoObjetivo();
 
-    // CORRECCIÓN: Lógica de Dificultad Progresiva basada en Nivel
-    let nuevoNivel = floor(puntuacion / 50); // Calcula el nivel (1 para 50, 2 para 100...)
+    // Lógica de Dificultad Progresiva basada en Nivel
+    let nuevoNivel = floor(puntuacion / 50); 
 
     if (nuevoNivel > nivelDificultad) {
-      nivelDificultad = nuevoNivel; // Actualiza el nivel actual
+      nivelDificultad = nuevoNivel; 
       
-      enemigoVelocidad += 0.5; // El enemigo se vuelve más rápido
-      velocidad += 0.5; // El personaje también se vuelve más rápido
+      enemigoVelocidad += 0.5; 
+      velocidad += 0.5; 
+      
+      // NUEVO: Activa el mensaje de Nivel Up
+      mostrarNivelUp = true;
+      nivelUpTiempo = millis(); // Guarda el tiempo actual
     }
   }
 
-  // --- 3. Lógica de Movimiento y Derrota del Enemigo ---
+  // --- 3. Lógica de Movimiento y Derrota del Enemigo con VIDA ---
   
   // Mover el enemigo lentamente hacia abajo
   enemigoY += enemigoVelocidad;
@@ -110,13 +134,31 @@ function draw() {
     enemigoX = random(50, width - 50);
   }
 
-  // Detección de Derrota
+  // --- Manejo de la Invulnerabilidad ---
+  if (invulnerable && millis() > tiempoInvulnerable + 2000) { // 2 segundos de invulnerabilidad
+    invulnerable = false; 
+  }
+  
+  // Detección de Colisión ENEMIGO/PERSONAJE
   let distanciaEnemigo = dist(personajeX, personajeY, enemigoX, enemigoY);
   let umbralColision = radioPersonaje + (enemigoTamaño / 2); 
   
-  if (distanciaEnemigo < umbralColision) {
-    juegoActivo = false; // El juego ya no está activo
-    noLoop(); // Detiene el bucle draw()
+  if (distanciaEnemigo < umbralColision && !invulnerable) {
+    vida -= 1; // Pierde 1 vida
+    invulnerable = true; // Activa la invulnerabilidad
+    tiempoInvulnerable = millis(); // Guarda el tiempo de activación
+    
+    // Si la vida llega a cero, ¡DERROTA!
+    if (vida <= 0) {
+      // NUEVO: Guardar la puntuación máxima si se supera
+      if (puntuacion > puntuacionMaxima) {
+        puntuacionMaxima = puntuacion;
+        localStorage.setItem('pixelDashRecord', puntuacionMaxima);
+      }
+      
+      juegoActivo = false; // El juego ya no está activo
+      noLoop(); // Detiene el bucle draw()
+    }
   }
 
   // --- 4. Dibujar Elementos ---
@@ -131,15 +173,43 @@ function draw() {
   rectMode(CENTER); 
   square(objetivoX, objetivoY, objetivoTamaño); 
 
-  // Dibujar el personaje (círculo rosa)
-  fill(255, 0, 100); 
-  circle(personajeX, personajeY, radioPersonaje * 2); 
+  // NUEVO: Dibuja el personaje con parpadeo si es invulnerable
+  if (!(invulnerable && (floor(millis() / 100) % 2 === 0))) {
+     // Dibuja el círculo solo si NO es invulnerable O si está en el momento "encendido" del parpadeo
+    fill(255, 0, 100); 
+    circle(personajeX, personajeY, radioPersonaje * 2); 
+  }
   
-  // Dibujar la puntuación en la esquina
+  // --- Dibujar Puntuaciones y Vida ---
+  
+  // Puntuación Actual
   fill(255);
   textSize(24);
   textAlign(LEFT, TOP); 
   text(`Puntuación: ${puntuacion}`, 10, 10);
+
+  // NUEVO: Puntuación Máxima
+  textSize(18); 
+  textAlign(RIGHT, TOP); 
+  text(`Máximo: ${puntuacionMaxima}`, width - 10, 10);
+  
+  // NUEVO: Vida
+  textAlign(LEFT, TOP);
+  textSize(20);
+  fill(255, 0, 0); // Rojo para la vida
+  text(`❤️ Vida: ${vida}`, 10, 40); 
+  
+  // NUEVO: Manejar y Dibujar el Mensaje de Nivel Up
+  if (mostrarNivelUp) {
+    if (millis() < nivelUpTiempo + 1500) { // Muestra por 1.5 segundos
+      fill(0, 255, 0); // Verde brillante
+      textSize(40);
+      textAlign(CENTER, CENTER);
+      text('¡NIVEL UP!', width / 2, height / 2 - 50); 
+    } else {
+      mostrarNivelUp = false; // Desactiva el mensaje
+    }
+  }
   
   // Mensaje de Derrota y Reinicio
   if (juegoActivo === false) {
