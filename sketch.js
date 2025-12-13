@@ -17,7 +17,7 @@ let sonidoDerrota;
 let sonidoNivelUp;
 
 function preload() {
-  // *** CORRECCIÓN DE AUDIO: Se cargan los archivos OGG ***
+  // *** CORRECCIÓN FINAL DE AUDIO: Asegura que busque los archivos OGG ***
   musicaFondo = loadSound('assets/musica.ogg'); 
   sonidoColeccion = loadSound('assets/coleccion.ogg'); 
   sonidoDerrota = loadSound('assets/derrota.ogg'); 
@@ -26,7 +26,7 @@ function preload() {
 
 function setup() {
   createCanvas(600, 400);
-  // *** CORRECCIÓN DE ESTADO: Eliminamos iniciarJuego() para que empiece en 'MENU' con 3 vidas ***
+  // *** CORRECCIÓN DE ESTADO: El juego debe empezar en 'MENU' ***
   rectMode(CENTER);
   ellipseMode(CENTER);
   textAlign(CENTER, CENTER);
@@ -39,7 +39,7 @@ function iniciarJuego() {
   velocidadX = velocidadInicial;
   velocidadY = velocidadInicial;
   puntos = 0;
-  vidas = 3;
+  vidas = 3; // ¡Inicia con 3 vidas!
   tiempoUltimoNivel = millis();
   generarCuadradoColeccion();
   estadoJuego = 'JUGANDO';
@@ -60,7 +60,7 @@ function draw() {
       break;
     case 'JUGANDO':
       logicaJuego();
-      dibujarHUD();
+      dibujarHUD(); // Dibuja puntos, vidas y velocidad
       break;
     case 'DERROTA':
       dibujarDerrota();
@@ -105,12 +105,12 @@ function logicaJuego() {
   }
 
   // 5. Dibujar elementos
-  // Cuadrado del jugador
-  fill(255, 0, 0);
+  // Cuadrado del jugador (ROJO)
+  fill(255, 0, 0); 
   rect(cuadradoX, cuadradoY, tamañoCuadrado, tamañoCuadrado);
   
-  // Cuadrado de colección
-  fill(255, 255, 0);
+  // Cuadrado de colección (AMARILLO)
+  fill(255, 255, 0); 
   ellipse(cuadradoColeccionX, cuadradoColeccionY, tamañoCuadrado, tamañoCuadrado);
   
   // Control de la música
@@ -142,7 +142,7 @@ function perderVida() {
 
 function dibujarHUD() {
   textSize(18);
-  fill(255);
+  fill(255); // Color BLANCO para el texto
   text('Puntos: ' + puntos, 50, 20);
   text('Vidas: ' + vidas, width - 50, 20);
   text('Velocidad: ' + nf(abs(velocidadX), 1, 1), 50, height - 20);
