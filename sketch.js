@@ -10,6 +10,12 @@ let tiempoUltimoNivel = 0;
 let intervaloNivel = 15000; // 15 segundos
 let velocidadMaxima = 6.5;
 
+// *** NUEVAS VARIABLES PARA EL ENEMIGO MÓVIL (Círculo Amarillo) ***
+let enemigoX, enemigoY;
+let velocidadEnemigoX, velocidadEnemigoY;
+let tamanoEnemigo = 25; // Tamaño del enemigo
+// ***************************************************************
+
 // Variables de sonido
 let musicaFondo;
 let sonidoColeccion;
@@ -42,20 +48,32 @@ function windowResized() {
 }
 
 function iniciarJuego() {
-  // Usa width y height de la pantalla completa para centrar
+  // Inicialización del jugador (cuadrado rojo)
   cuadradoX = width / 2;
   cuadradoY = height / 2;
   velocidadX = velocidadInicial;
   velocidadY = velocidadInicial;
+  
+  // Inicialización de puntuación y estado
   puntos = 0;
-  vidas = 3; // ¡Inicia con 3 vidas!
+  vidas = 3;
   tiempoUltimoNivel = millis();
+  
+  // Inicialización del coleccionable (círculo azul)
   generarCuadradoColeccion();
+  
+  // *** INICIALIZACIÓN DEL ENEMIGO MÓVIL (Círculo Amarillo) ***
+  enemigoX = width * 0.75; 
+  enemigoY = height * 0.25;
+  velocidadEnemigoX = 3;
+  velocidadEnemigoY = -3;
+  // ***********************************************************
+  
   estadoJuego = 'JUGANDO';
 }
 
 function generarCuadradoColeccion() {
-  // Usa width y height de la pantalla completa
+  // Genera el coleccionable (azul) en una posición aleatoria (fija hasta ser recogido)
   cuadradoColeccionX = random(tamañoCuadrado * 2, width - tamañoCuadrado * 2);
   cuadradoColeccionY = random(tamañoCuadrado * 2, height - tamañoCuadrado * 2);
 }
@@ -88,13 +106,23 @@ function dibujarMenu() {
 }
 
 function logicaJuego() {
-  // 1. Mover el cuadrado (SOLO EL JUGADOR ROJO)
+  // 1. Mover el cuadrado ROJO (Jugador)
   cuadradoX += velocidadX;
   cuadradoY += velocidadY;
 
-  // *** IMPORTANTE: NO HAY CÓDIGO AQUÍ PARA MOVER cuadradoColeccionX/Y ***
+  // 2. Mover el ENEMIGO AMARILLO (Pelota)
+  enemigoX += velocidadEnemigoX;
+  enemigoY += velocidadEnemigoY;
+  
+  // 3. Comprobar rebote del ENEMIGO AMARILLO
+  if (enemigoX > width - tamanoEnemigo / 2 || enemigoX < tamanoEnemigo / 2) {
+    velocidadEnemigoX *= -1;
+  }
+  if (enemigoY > height - tamanoEnemigo / 2 || enemigoY < tamanoEnemigo / 2) {
+    velocidadEnemigoY *= -1;
+  }
 
-  // 2. Comprobar colisiones con bordes
+  // 4. Comprobar colisiones del jugador (ROJO) con bordes
   if (cuadradoX > width - tamañoCuadrado / 2 || cuadradoX < tamañoCuadrado / 2) {
     velocidadX *= -1;
     perderVida();
@@ -104,26 +132,44 @@ function logicaJuego() {
     perderVida();
   }
   
-  // 3. Comprobar colección
+  // 5. Comprobar colisión del JUGADOR (ROJO) con el ENEMIGO (AMARILLO)
+  // Colisión entre un cuadrado y un círculo (simplificada)
+  if (dist(cuadradoX, cuadradoY, enemigoX, enemigoY) < (tamañoCuadrado/2 + tamanoEnemigo/2)) {
+    perderVida();
+    
+    // Reubicar el enemigo al azar después de la colisión para evitar pérdida múltiple
+    enemigoX = random(width * 0.3, width * 0.7);
+    enemigoY = random(height * 0.3, height * 0.7);
+    
+    // Invertir la dirección del jugador al chocar (efecto de rebote)
+    velocidadX *= -1;
+    velocidadY *= -1;
+  }
+  
+  // 6. Comprobar colección (Cuadrado Azul)
   if (dist(cuadradoX, cuadradoY, cuadradoColeccionX, cuadradoColeccionY) < tamañoCuadrado) {
     puntos++;
     generarCuadradoColeccion();
     sonidoColeccion.play();
   }
 
-  // 4. Aumentar nivel (velocidad)
+  // 7. Aumentar nivel
   if (millis() - tiempoUltimoNivel > intervaloNivel) {
     aumentarNivel();
   }
 
-  // 5. Dibujar elementos
+  // 8. Dibujar elementos
   // Cuadrado del jugador (ROJO)
   fill(255, 0, 0); 
   rect(cuadradoX, cuadradoY, tamañoCuadrado, tamañoCuadrado);
   
-  // Cuadrado de colección (AZUL)
+  // Círculo de colección (AZUL)
   fill(0, 0, 255); 
   ellipse(cuadradoColeccionX, cuadradoColeccionY, tamañoCuadrado, tamañoCuadrado);
+  
+  // ENEMIGO MÓVIL (AMARILLO)
+  fill(255, 255, 0);
+  ellipse(enemigoX, enemigoY, tamanoEnemigo, tamanoEnemigo);
   
   // Control de la música
   if (!musicaFondo.isPlaying()) {
@@ -154,19 +200,19 @@ function perderVida() {
 function dibujarHUD() {
   textSize(18);
   
-  // 1. Dibuja el texto Puntos (en blanco) - POSICIÓN INFERIOR IZQUIERDA
+  // 1. Puntos
   fill(255);
   text('Puntos: ' + puntos, 70, height - 20); 
   
-  // 2. Dibuja el texto Velocidad (en blanco) - POSICIÓN INFERIOR DERECHA
+  // 2. Velocidad
   fill(255);
   text('Velocidad: ' + nf(abs(velocidadX), 1, 1), width - 70, height - 20); 
   
-  // 3. Dibuja el texto "Vidas:" (en blanco) - POSICIÓN SUPERIOR IZQUIERDA
+  // 3. Texto "Vidas:"
   fill(255);
   text('Vidas:', 150, 20);
 
-  // 4. Dibuja los círculos rojos (las vidas / corazones)
+  // 4. Círculos rojos (vidas)
   let inicioX = 180; 
   let tamañoVida = 15;
   
