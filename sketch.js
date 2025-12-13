@@ -30,7 +30,7 @@ function setup() {
   // Esto evita que aparezcan barras de desplazamiento
   document.documentElement.style.overflow = 'hidden'; 
   
-  // ARREGLO DE ESTADO: El juego debe empezar en 'MENU'
+  // ARREGLO DE ESTADO
   rectMode(CENTER);
   ellipseMode(CENTER);
   textAlign(CENTER, CENTER);
@@ -150,7 +150,7 @@ function perderVida() {
   }
 }
 
-// *** ARREGLO DE HUD Y POSICIONAMIENTO PARA PANTALLA COMPLETA ***
+// *** CÓDIGO FINAL DE HUD (Posiciones ajustadas para pantalla completa) ***
 function dibujarHUD() {
   textSize(18);
   
@@ -160,4 +160,39 @@ function dibujarHUD() {
   
   // 2. Dibuja el texto Velocidad (en blanco) - POSICIÓN INFERIOR DERECHA
   fill(255);
-  text('Velocidad: ' + nf(abs(velocidadX), 1, 1
+  text('Velocidad: ' + nf(abs(velocidadX), 1, 1), width - 70, height - 20); 
+  
+  // 3. Dibuja el texto "Vidas:" (en blanco) - POSICIÓN SUPERIOR IZQUIERDA
+  fill(255);
+  text('Vidas:', 150, 20);
+
+  // 4. Dibuja los círculos rojos (las vidas / corazones)
+  let inicioX = 180; // Posición de inicio para los círculos
+  let tamañoVida = 15;
+  
+  noStroke(); // Evita bordes
+  fill(255, 0, 0); // Color Rojo para los círculos
+  
+  for (let i = 0; i < vidas; i++) {
+    ellipse(inicioX + (i * 20), 20, tamañoVida, tamañoVida); 
+  }
+}
+// *** FIN DE DIBUJARHUD ***
+
+function dibujarDerrota() {
+  textSize(40);
+  fill(255, 0, 0);
+  text('GAME OVER', width / 2, height / 2 - 50);
+  textSize(24);
+  fill(200);
+  text('Puntos Finales: ' + puntos, width / 2, height / 2);
+  text('Presiona ESPACIO para REINICIAR', width / 2, height / 2 + 50);
+}
+
+function keyPressed() {
+  if (key === ' ' || key === 'Spacebar') {
+    if (estadoJuego === 'MENU' || estadoJuego === 'DERROTA') {
+      iniciarJuego();
+    }
+  }
+}
