@@ -17,7 +17,7 @@ let sonidoDerrota;
 let sonidoNivelUp;
 
 function preload() {
-  // *** CORRECCIÓN FINAL DE AUDIO: Asegura que busque los archivos OGG ***
+  // *** ARREGLO DE CARGA: Se buscan los archivos OGG ***
   musicaFondo = loadSound('assets/musica.ogg'); 
   sonidoColeccion = loadSound('assets/coleccion.ogg'); 
   sonidoDerrota = loadSound('assets/derrota.ogg'); 
@@ -26,7 +26,7 @@ function preload() {
 
 function setup() {
   createCanvas(600, 400);
-  // *** CORRECCIÓN DE ESTADO: El juego debe empezar en 'MENU' ***
+  // ARREGLO DE ESTADO: El juego debe empezar en 'MENU'
   rectMode(CENTER);
   ellipseMode(CENTER);
   textAlign(CENTER, CENTER);
@@ -60,7 +60,7 @@ function draw() {
       break;
     case 'JUGANDO':
       logicaJuego();
-      dibujarHUD(); // Dibuja puntos, vidas y velocidad
+      dibujarHUD(); // Dibuja puntos, vidas (círculos) y velocidad
       break;
     case 'DERROTA':
       dibujarDerrota();
@@ -120,48 +120,4 @@ function logicaJuego() {
 }
 
 function aumentarNivel() {
-  tiempoUltimoNivel = millis();
-  let nuevaVelocidad = velocidadInicial + 0.5 * (floor(puntos / 5) + 1);
-
-  if (nuevaVelocidad < velocidadMaxima) {
-    // Aplicar la nueva velocidad manteniendo la dirección
-    velocidadX = (velocidadX > 0 ? 1 : -1) * nuevaVelocidad;
-    velocidadY = (velocidadY > 0 ? 1 : -1) * nuevaVelocidad;
-    sonidoNivelUp.play();
-  }
-}
-
-function perderVida() {
-  vidas--;
-  if (vidas <= 0) {
-    estadoJuego = 'DERROTA';
-    musicaFondo.stop();
-    sonidoDerrota.play();
-  }
-}
-
-function dibujarHUD() {
-  textSize(18);
-  fill(255); // Color BLANCO para el texto
-  text('Puntos: ' + puntos, 50, 20);
-  text('Vidas: ' + vidas, width - 50, 20);
-  text('Velocidad: ' + nf(abs(velocidadX), 1, 1), 50, height - 20);
-}
-
-function dibujarDerrota() {
-  textSize(40);
-  fill(255, 0, 0);
-  text('GAME OVER', width / 2, height / 2 - 50);
-  textSize(24);
-  fill(200);
-  text('Puntos Finales: ' + puntos, width / 2, height / 2);
-  text('Presiona ESPACIO para REINICIAR', width / 2, height / 2 + 50);
-}
-
-function keyPressed() {
-  if (key === ' ' || key === 'Spacebar') {
-    if (estadoJuego === 'MENU' || estadoJuego === 'DERROTA') {
-      iniciarJuego();
-    }
-  }
-}
+  tiempoUltimoN
