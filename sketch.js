@@ -1,3 +1,4 @@
+
 let estadoJuego = 'MENU';
 let cuadradoX, cuadradoY;
 let velocidadX, velocidadY;
