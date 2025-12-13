@@ -88,9 +88,11 @@ function dibujarMenu() {
 }
 
 function logicaJuego() {
-  // 1. Mover el cuadrado
+  // 1. Mover el cuadrado (SOLO EL JUGADOR ROJO)
   cuadradoX += velocidadX;
   cuadradoY += velocidadY;
+
+  // *** IMPORTANTE: NO HAY CÓDIGO AQUÍ PARA MOVER cuadradoColeccionX/Y ***
 
   // 2. Comprobar colisiones con bordes
   if (cuadradoX > width - tamañoCuadrado / 2 || cuadradoX < tamañoCuadrado / 2) {
@@ -119,7 +121,7 @@ function logicaJuego() {
   fill(255, 0, 0); 
   rect(cuadradoX, cuadradoY, tamañoCuadrado, tamañoCuadrado);
   
-  // *** Cuadrado de colección (AZUL) ***
+  // Cuadrado de colección (AZUL)
   fill(0, 0, 255); 
   ellipse(cuadradoColeccionX, cuadradoColeccionY, tamañoCuadrado, tamañoCuadrado);
   
