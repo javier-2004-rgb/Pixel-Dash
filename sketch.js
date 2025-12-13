@@ -1,4 +1,3 @@
-
 let estadoJuego = 'MENU';
 let cuadradoX, cuadradoY;
 let velocidadX, velocidadY;
@@ -18,7 +17,7 @@ let sonidoDerrota;
 let sonidoNivelUp;
 
 function preload() {
-  // *** CORRECCIÓN CRUCIAL: Se cargan los archivos OGG ***
+  // *** CORRECCIÓN DE AUDIO: Se cargan los archivos OGG ***
   musicaFondo = loadSound('assets/musica.ogg'); 
   sonidoColeccion = loadSound('assets/coleccion.ogg'); 
   sonidoDerrota = loadSound('assets/derrota.ogg'); 
@@ -27,7 +26,7 @@ function preload() {
 
 function setup() {
   createCanvas(600, 400);
-  iniciarJuego();
+  // *** CORRECCIÓN DE ESTADO: Eliminamos iniciarJuego() para que empiece en 'MENU' con 3 vidas ***
   rectMode(CENTER);
   ellipseMode(CENTER);
   textAlign(CENTER, CENTER);
@@ -114,8 +113,7 @@ function logicaJuego() {
   fill(255, 255, 0);
   ellipse(cuadradoColeccionX, cuadradoColeccionY, tamañoCuadrado, tamañoCuadrado);
   
-  // ** Control de la música **
-  // Aseguramos que la música suene solo una vez
+  // Control de la música
   if (!musicaFondo.isPlaying()) {
     musicaFondo.loop();
   }
