@@ -1,21 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Mi Primer Juego Web</title>
-    
-        <script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js"></script>
+    <meta charset="utf-8">
+    <title>Mi Primer Juego Web</title>
     
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/addons/p5.sound.min.js"></script>
     
-        <script src="sketch.js"></script>
+    <script src="sketch.js"></script>
     
-    <style>
-        /* Centra el juego en la pantalla */
-        body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #282c34; }
-    </style>
+    <style>
+        /* *** CORRECCIÓN CRUCIAL PARA PANTALLA COMPLETA *** */
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Elimina barras de desplazamiento */
+            width: 100%;
+            height: 100%;
+            background-color: #000000; /* Fondo negro fuera del canvas (opcional) */
+        }
+        
+        /* Asegura que el contenedor principal también use todo el espacio */
+        main {
+            display: block; /* Asegura que el canvas se muestre correctamente */
+        }
+    </style>
 </head>
 <body>
-    <main></main>
+    <main></main>
 </body>
 </html>
