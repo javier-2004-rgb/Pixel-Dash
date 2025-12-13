@@ -120,4 +120,69 @@ function logicaJuego() {
 }
 
 function aumentarNivel() {
-  tiempoUltimoN
+  tiempoUltimoNivel = millis();
+  let nuevaVelocidad = velocidadInicial + 0.5 * (floor(puntos / 5) + 1);
+
+  if (nuevaVelocidad < velocidadMaxima) {
+    // Aplicar la nueva velocidad manteniendo la dirección
+    velocidadX = (velocidadX > 0 ? 1 : -1) * nuevaVelocidad;
+    velocidadY = (velocidadY > 0 ? 1 : -1) * nuevaVelocidad;
+    sonidoNivelUp.play();
+  }
+}
+
+function perderVida() {
+  vidas--;
+  if (vidas <= 0) {
+    estadoJuego = 'DERROTA';
+    musicaFondo.stop();
+    sonidoDerrota.play();
+  }
+}
+
+// *** CÓDIGO FINAL DE HUD (Revisado para asegurar la visibilidad de las vidas) ***
+function dibujarHUD() {
+  textSize(18);
+  
+  // 1. Dibuja el texto Puntos y Velocidad (en blanco)
+  fill(255);
+  text('Puntos: ' + puntos, 50, 20);
+  text('Velocidad: ' + nf(abs(velocidadX), 1, 1), 50, height - 20);
+  
+  // 2. Dibuja el texto "Vidas:" (en blanco)
+  fill(255);
+  text('Vidas:', width - 150, 20);
+
+  // 3. Dibuja los círculos rojos (las vidas)
+  let inicioX = width - 120;
+  let tamañoVida = 15;
+  
+  noStroke(); // Evita bordes que puedan causar conflicto
+  fill(255, 0, 0); // Color Rojo para los círculos
+  
+  for (let i = 0; i < vidas; i++) {
+    ellipse(inicioX + (i * 20), 20, tamañoVida, tamañoVida); 
+  }
+  
+  // NOTA: El "cuadro azul" que mencionas no estaba en el código,
+  // pero este arreglo garantiza que los indicadores de vida SÍ se dibujen.
+}
+// *** FIN DE DIBUJARHUD ***
+
+function dibujarDerrota() {
+  textSize(40);
+  fill(255, 0, 0);
+  text('GAME OVER', width / 2, height / 2 - 50);
+  textSize(24);
+  fill(200);
+  text('Puntos Finales: ' + puntos, width / 2, height / 2);
+  text('Presiona ESPACIO para REINICIAR', width / 2, height / 2 + 50);
+}
+
+function keyPressed() {
+  if (key === ' ' || key === 'Spacebar') {
+    if (estadoJuego === 'MENU' || estadoJuego === 'DERROTA') {
+      iniciarJuego();
+    }
+  }
+}
