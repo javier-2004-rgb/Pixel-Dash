@@ -17,7 +17,7 @@ let sonidoDerrota;
 let sonidoNivelUp;
 
 function preload() {
-  // *** ARREGLO DE CARGA: Se buscan los archivos OGG ***
+  // ARREGLO DE CARGA: Se buscan los archivos OGG
   musicaFondo = loadSound('assets/musica.ogg'); 
   sonidoColeccion = loadSound('assets/coleccion.ogg'); 
   sonidoDerrota = loadSound('assets/derrota.ogg'); 
@@ -25,7 +25,11 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(600, 400);
+  // *** ARREGLO PANTALLA COMPLETA: Usa el ancho y alto de la ventana del navegador ***
+  createCanvas(windowWidth, windowHeight); 
+  // Esto evita que aparezcan barras de desplazamiento
+  document.documentElement.style.overflow = 'hidden'; 
+  
   // ARREGLO DE ESTADO: El juego debe empezar en 'MENU'
   rectMode(CENTER);
   ellipseMode(CENTER);
@@ -33,7 +37,13 @@ function setup() {
   textSize(24);
 }
 
+// ARREGLO PANTALLA COMPLETA: Ajusta el canvas si se cambia el tamaño de la ventana
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
 function iniciarJuego() {
+  // Usa width y height de la pantalla completa para centrar
   cuadradoX = width / 2;
   cuadradoY = height / 2;
   velocidadX = velocidadInicial;
@@ -46,6 +56,7 @@ function iniciarJuego() {
 }
 
 function generarCuadradoColeccion() {
+  // Usa width y height de la pantalla completa
   cuadradoColeccionX = random(tamañoCuadrado * 2, width - tamañoCuadrado * 2);
   cuadradoColeccionY = random(tamañoCuadrado * 2, height - tamañoCuadrado * 2);
 }
@@ -82,7 +93,7 @@ function logicaJuego() {
   cuadradoX += velocidadX;
   cuadradoY += velocidadY;
 
-  // 2. Comprobar colisiones con bordes
+  // 2. Comprobar colisiones con bordes (usa width y height de la pantalla completa)
   if (cuadradoX > width - tamañoCuadrado / 2 || cuadradoX < tamañoCuadrado / 2) {
     velocidadX *= -1;
     perderVida();
@@ -124,7 +135,6 @@ function aumentarNivel() {
   let nuevaVelocidad = velocidadInicial + 0.5 * (floor(puntos / 5) + 1);
 
   if (nuevaVelocidad < velocidadMaxima) {
-    // Aplicar la nueva velocidad manteniendo la dirección
     velocidadX = (velocidadX > 0 ? 1 : -1) * nuevaVelocidad;
     velocidadY = (velocidadY > 0 ? 1 : -1) * nuevaVelocidad;
     sonidoNivelUp.play();
@@ -140,49 +150,14 @@ function perderVida() {
   }
 }
 
-// *** CÓDIGO FINAL DE HUD (Revisado para asegurar la visibilidad de las vidas) ***
+// *** ARREGLO DE HUD Y POSICIONAMIENTO PARA PANTALLA COMPLETA ***
 function dibujarHUD() {
   textSize(18);
   
-  // 1. Dibuja el texto Puntos y Velocidad (en blanco)
+  // 1. Dibuja el texto Puntos (en blanco) - POSICIÓN INFERIOR IZQUIERDA
   fill(255);
-  text('Puntos: ' + puntos, 50, 20);
-  text('Velocidad: ' + nf(abs(velocidadX), 1, 1), 50, height - 20);
+  text('Puntos: ' + puntos, 70, height - 20); 
   
-  // 2. Dibuja el texto "Vidas:" (en blanco)
+  // 2. Dibuja el texto Velocidad (en blanco) - POSICIÓN INFERIOR DERECHA
   fill(255);
-  text('Vidas:', width - 150, 20);
-
-  // 3. Dibuja los círculos rojos (las vidas)
-  let inicioX = width - 120;
-  let tamañoVida = 15;
-  
-  noStroke(); // Evita bordes que puedan causar conflicto
-  fill(255, 0, 0); // Color Rojo para los círculos
-  
-  for (let i = 0; i < vidas; i++) {
-    ellipse(inicioX + (i * 20), 20, tamañoVida, tamañoVida); 
-  }
-  
-  // NOTA: El "cuadro azul" que mencionas no estaba en el código,
-  // pero este arreglo garantiza que los indicadores de vida SÍ se dibujen.
-}
-// *** FIN DE DIBUJARHUD ***
-
-function dibujarDerrota() {
-  textSize(40);
-  fill(255, 0, 0);
-  text('GAME OVER', width / 2, height / 2 - 50);
-  textSize(24);
-  fill(200);
-  text('Puntos Finales: ' + puntos, width / 2, height / 2);
-  text('Presiona ESPACIO para REINICIAR', width / 2, height / 2 + 50);
-}
-
-function keyPressed() {
-  if (key === ' ' || key === 'Spacebar') {
-    if (estadoJuego === 'MENU' || estadoJuego === 'DERROTA') {
-      iniciarJuego();
-    }
-  }
-}
+  text('Velocidad: ' + nf(abs(velocidadX), 1, 1
