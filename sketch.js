@@ -25,9 +25,8 @@ function preload() {
 }
 
 function setup() {
-  // *** ARREGLO PANTALLA COMPLETA: Usa el ancho y alto de la ventana del navegador ***
+  // ARREGLO PANTALLA COMPLETA
   createCanvas(windowWidth, windowHeight); 
-  // Esto evita que aparezcan barras de desplazamiento
   document.documentElement.style.overflow = 'hidden'; 
   
   // ARREGLO DE ESTADO
@@ -37,7 +36,7 @@ function setup() {
   textSize(24);
 }
 
-// ARREGLO PANTALLA COMPLETA: Ajusta el canvas si se cambia el tamaño de la ventana
+// ARREGLO PANTALLA COMPLETA
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
@@ -71,7 +70,7 @@ function draw() {
       break;
     case 'JUGANDO':
       logicaJuego();
-      dibujarHUD(); // Dibuja puntos, vidas (círculos) y velocidad
+      dibujarHUD();
       break;
     case 'DERROTA':
       dibujarDerrota();
@@ -93,7 +92,7 @@ function logicaJuego() {
   cuadradoX += velocidadX;
   cuadradoY += velocidadY;
 
-  // 2. Comprobar colisiones con bordes (usa width y height de la pantalla completa)
+  // 2. Comprobar colisiones con bordes
   if (cuadradoX > width - tamañoCuadrado / 2 || cuadradoX < tamañoCuadrado / 2) {
     velocidadX *= -1;
     perderVida();
@@ -120,8 +119,8 @@ function logicaJuego() {
   fill(255, 0, 0); 
   rect(cuadradoX, cuadradoY, tamañoCuadrado, tamañoCuadrado);
   
-  // Cuadrado de colección (AMARILLO)
-  fill(255, 255, 0); 
+  // *** Cuadrado de colección (AZUL) ***
+  fill(0, 0, 255); 
   ellipse(cuadradoColeccionX, cuadradoColeccionY, tamañoCuadrado, tamañoCuadrado);
   
   // Control de la música
@@ -150,7 +149,6 @@ function perderVida() {
   }
 }
 
-// *** CÓDIGO FINAL DE HUD (Posiciones ajustadas para pantalla completa) ***
 function dibujarHUD() {
   textSize(18);
   
@@ -167,17 +165,16 @@ function dibujarHUD() {
   text('Vidas:', 150, 20);
 
   // 4. Dibuja los círculos rojos (las vidas / corazones)
-  let inicioX = 180; // Posición de inicio para los círculos
+  let inicioX = 180; 
   let tamañoVida = 15;
   
-  noStroke(); // Evita bordes
-  fill(255, 0, 0); // Color Rojo para los círculos
+  noStroke(); 
+  fill(255, 0, 0); 
   
   for (let i = 0; i < vidas; i++) {
     ellipse(inicioX + (i * 20), 20, tamañoVida, tamañoVida); 
   }
 }
-// *** FIN DE DIBUJARHUD ***
 
 function dibujarDerrota() {
   textSize(40);
